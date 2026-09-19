@@ -19,10 +19,6 @@ public sealed class AppSettings
 
     public ThemeMode Theme { get; set; } = ThemeMode.Dark;
 
-    public bool ClipboardHistoryEnabled { get; set; } = true;
-
-    public int ClipboardHistoryMaxEntries { get; set; } = 200;
-
     public bool StartWithSystem { get; set; }
 
     /// <summary>Global hotkey in display form, e.g. "Ctrl+Alt+W". Parsed by <see cref="Core.HotkeyPattern"/>.</summary>

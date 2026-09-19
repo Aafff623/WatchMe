@@ -15,34 +15,47 @@ public class NoteStoreTests : IDisposable
         var store = NewStore();
         store.Load();
         Assert.Single(store.Notes);
+        Assert.Equal(NoteStore.DefaultTags, store.Tags);
     }
 
     [Fact]
-    public void CreateNote_DeleteNote_UndoDelete_RoundTrips()
+    public void AddNote_AssignsTag_AndRegistersUnknownTag()
     {
         var store = NewStore();
         store.Load();
-        var note = store.CreateNote();
-        store.SetText(note.Id, "second note");
+        store.AddNote("买牛奶", "生活");
+        store.AddNote("写周报", "工作");
+
+        Assert.Equal(3, store.Notes.Count);
+        Assert.Equal("生活", store.Notes[1].Tag);
+        Assert.Contains("生活", store.Tags);
+        Assert.Contains("工作", store.Tags);
+    }
+
+    [Fact]
+    public void AddNote_BlankTag_FallsBackToDefault()
+    {
+        var store = NewStore();
+        store.Load();
+        store.AddNote("quick", "  ");
+        Assert.Equal("默认", store.Notes[1].Tag);
+    }
+
+    [Fact]
+    public void DeleteNote_UndoDelete_RoundTrips()
+    {
+        var store = NewStore();
+        store.Load();
+        var note = store.AddNote("temporary", "工作");
+        Assert.Equal(2, store.Notes.Count);
 
         Assert.True(store.DeleteNote(note.Id));
         Assert.Single(store.Notes);
 
         var restored = store.UndoDeleteNote();
         Assert.NotNull(restored);
-        Assert.Equal("second note", restored!.Text);
+        Assert.Equal("temporary", restored!.Text);
         Assert.Equal(2, store.Notes.Count);
-    }
-
-    [Fact]
-    public void DeleteLastNote_AlwaysKeepsOne()
-    {
-        var store = NewStore();
-        store.Load();
-        var only = store.Notes[0];
-        Assert.True(store.DeleteNote(only.Id));
-        Assert.Single(store.Notes);
-        Assert.NotEqual(only.Id, store.Notes[0].Id);
     }
 
     [Fact]
@@ -54,33 +67,98 @@ public class NoteStoreTests : IDisposable
     }
 
     [Fact]
+    public void SetDone_TogglesFlag()
+    {
+        var store = NewStore();
+        store.Load();
+        var note = store.AddNote("todo item", "工作");
+        Assert.False(note.IsDone);
+
+        store.SetDone(note.Id, true);
+        Assert.True(store.Notes.First(n => n.Id == note.Id).IsDone);
+
+        store.SetDone(note.Id, false);
+        Assert.False(store.Notes.First(n => n.Id == note.Id).IsDone);
+    }
+
+    [Fact]
+    public void SetTag_MovesNote_AndRegistersNewTag()
+    {
+        var store = NewStore();
+        store.Load();
+        var note = store.AddNote("flexible", "默认");
+        store.SetTag(note.Id, "灵感");
+
+        Assert.Equal("灵感", store.Notes.First(n => n.Id == note.Id).Tag);
+        Assert.Contains("灵感", store.Tags);
+    }
+
+    [Fact]
+    public void FilteredBy_ReturnsOnlyMatchingTag()
+    {
+        var store = NewStore();
+        store.Load();
+        store.AddNote("a", "工作");
+        store.AddNote("b", "生活");
+        store.AddNote("c", "工作");
+
+        Assert.Equal(2, store.FilteredBy("工作").Count);
+        Assert.Single(store.FilteredBy("生活"));
+        Assert.Equal(4, store.FilteredBy("全部").Count);
+        Assert.Equal(4, store.FilteredBy(null).Count);
+    }
+
+    [Fact]
+    public void SetText_UpdatesTimestamp()
+    {
+        var store = NewStore();
+        store.Load();
+        var note = store.AddNote("first", "默认");
+        var before = note.UpdatedAt;
+        store.SetText(note.Id, "second");
+
+        var stored = store.Notes.First(n => n.Id == note.Id);
+        Assert.Equal("second", stored.Text);
+        Assert.True(stored.UpdatedAt >= before);
+    }
+
+    [Fact]
     public void SaveNow_SurvivesReload()
     {
         var store = NewStore();
         store.Load();
-        var note = store.CreateNote();
-        store.SetText(note.Id, "# 标题\n正文");
+        store.AddNote("# 保留", "工作");
+        store.AddNote("done one", "生活");
+        store.SetDone(store.Notes[2].Id, true);
         store.SaveNow();
 
         var reloaded = NewStore();
         reloaded.Load();
-        Assert.Equal(2, reloaded.Notes.Count);
-        Assert.Equal("# 标题\n正文", reloaded.Notes.First(n => n.Id == note.Id).Text);
+        Assert.Equal(3, reloaded.Notes.Count);
+        Assert.Equal("# 保留", reloaded.Notes[1].Text);
+        Assert.True(reloaded.Notes[2].IsDone);
+        Assert.Contains("工作", reloaded.Tags);
     }
 
     [Fact]
-    public void Title_DerivesFromFirstMeaningfulLine_StrippingMarkers()
+    public void Load_MigratesV1Notes_WithSavedAtAndText()
     {
-        var note = new Note { Text = "\n# Hello *World*\nsecond line" };
-        Assert.Equal("Hello *World*", note.Title);
-    }
+        const string v1Json = """
+            {
+              "version": 1,
+              "notes": [
+                { "id": "abc", "text": "legacy note", "savedAt": "2026-01-02T03:04:05+08:00" }
+              ]
+            }
+            """;
+        File.WriteAllText(_path, v1Json);
 
-    [Fact]
-    public void Title_TruncatesLongLines()
-    {
-        var note = new Note { Text = new string('x', 60) };
-        Assert.EndsWith("…", note.Title);
-        Assert.True(note.Title.Length <= 26);
+        var store = NewStore();
+        store.Load();
+        Assert.Single(store.Notes);
+        Assert.Equal("legacy note", store.Notes[0].Text);
+        Assert.Equal("默认", store.Notes[0].Tag);
+        Assert.Equal(new DateTimeOffset(2026, 1, 2, 3, 4, 5, TimeSpan.FromHours(8)), store.Notes[0].UpdatedAt);
     }
 
     public void Dispose()

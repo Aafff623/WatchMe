@@ -12,14 +12,7 @@ public sealed class SettingsStore
 
     public AppSettings Load()
     {
-        var loaded = JsonFile.TryLoad<AppSettings>(_filePath);
-        if (loaded is null)
-            return new AppSettings();
-
-        // Guard against a corrupted cap coming from an older release.
-        if (loaded.ClipboardHistoryMaxEntries is < 10 or > 1000)
-            loaded.ClipboardHistoryMaxEntries = 200;
-        return loaded;
+        return JsonFile.TryLoad<AppSettings>(_filePath) ?? new AppSettings();
     }
 
     public void Save(AppSettings settings) => JsonFile.Save(_filePath, settings);

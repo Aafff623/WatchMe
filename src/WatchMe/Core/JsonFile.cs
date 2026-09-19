@@ -11,6 +11,7 @@ public static class JsonFile
     {
         WriteIndented = true,
         DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+        PropertyNameCaseInsensitive = true,
     };
 
     public static T? TryLoad<T>(string path) where T : class

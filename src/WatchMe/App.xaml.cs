@@ -1,7 +1,6 @@
 using System.IO;
 using System.Threading;
 using System.Windows;
-using WatchMe.KeepAwake;
 using WatchMe.Notch;
 using WatchMe.Settings;
 using WatchMe.Themes;
@@ -11,6 +10,7 @@ namespace WatchMe;
 public partial class App : Application
 {
     private static Mutex? _singleInstance;
+    private static bool _ownsSingleInstance;
     private NotchController? _controller;
 
     protected override void OnStartup(StartupEventArgs e)
@@ -39,8 +39,11 @@ public partial class App : Application
     private void StartupCore(StartupEventArgs e)
     {
         _singleInstance = new Mutex(initiallyOwned: true, $"{AppPaths.BundleId}.SingleInstance", out var createdNew);
+        _ownsSingleInstance = createdNew;
         if (!createdNew)
         {
+            _singleInstance.Dispose();
+            _singleInstance = null;
             MessageBox.Show("WatchMe 已在运行（可在系统托盘中找到它）。", "WatchMe",
                 MessageBoxButton.OK, MessageBoxImage.Information);
             Shutdown();
@@ -52,8 +55,7 @@ public partial class App : Application
         var settings = SettingsStore.Default().Load();
         ThemeManager.Apply(settings.Theme);
 
-        _controller = new NotchController(settings,
-            KeepAwakeController.Default(new ExecutionStateApi(), new PowerProcessRunner()));
+        _controller = new NotchController(settings);
         Exit += (_, _) => _controller.Shutdown();
     }
 
@@ -74,7 +76,20 @@ public partial class App : Application
     protected override void OnExit(ExitEventArgs e)
     {
         _controller?.Dispose();
-        _singleInstance?.ReleaseMutex();
+        // Only the owning instance may release the mutex; others already disposed theirs.
+        if (_ownsSingleInstance)
+        {
+            try
+            {
+                _singleInstance?.ReleaseMutex();
+            }
+            catch (ApplicationException)
+            {
+                // Ownership was lost (e.g. thread aborted) — nothing to release.
+            }
+        }
+
+        _singleInstance?.Dispose();
         base.OnExit(e);
     }
 }

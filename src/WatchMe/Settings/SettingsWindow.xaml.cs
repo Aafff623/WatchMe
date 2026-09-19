@@ -5,12 +5,12 @@ using WatchMe.Core;
 
 namespace WatchMe.Settings;
 
-/// <summary>Settings dialog: trigger mode, theme, hotkey, screen, clipboard history, autostart, lid sleep.</summary>
+/// <summary>Settings dialog: trigger mode, theme, hotkey, screen, autostart.</summary>
 public partial class SettingsWindow : Window
 {
     private readonly AppSettings _current;
 
-    public SettingsWindow(AppSettings current, bool lidNeverSleepActive)
+    public SettingsWindow(AppSettings current)
     {
         InitializeComponent();
         _current = current;
@@ -19,10 +19,7 @@ public partial class SettingsWindow : Window
         TriggerClick.IsChecked = current.Trigger == TriggerMode.Click;
         ThemeCombo.SelectedIndex = (int)current.Theme;
         HotkeyInput.Text = current.HotkeyDisplay;
-        ClipboardEnabled.IsChecked = current.ClipboardHistoryEnabled;
-        ClipboardCapInput.Text = current.ClipboardHistoryMaxEntries.ToString();
         AutoStartCheck.IsChecked = current.StartWithSystem;
-        LidNeverSleepCheck.IsChecked = lidNeverSleepActive;
 
         foreach (var screen in Notch.ScreenLocator.Monitors())
         {
@@ -39,9 +36,6 @@ public partial class SettingsWindow : Window
 
     /// <summary>The pending settings when the user pressed 保存; null otherwise.</summary>
     public AppSettings? PendingSettings { get; private set; }
-
-    /// <summary>The lid-no-sleep state the user wants after saving.</summary>
-    public bool LidNeverSleepDesired => LidNeverSleepCheck.IsChecked == true;
 
     private void OnSave(object sender, RoutedEventArgs e)
     {
@@ -69,8 +63,6 @@ public partial class SettingsWindow : Window
             Trigger = TriggerHover.IsChecked == true ? TriggerMode.Hover : TriggerMode.Click,
             Theme = (ThemeMode)Math.Max(0, ThemeCombo.SelectedIndex),
             HotkeyDisplay = HotkeyInput.Text.Trim(),
-            ClipboardHistoryEnabled = ClipboardEnabled.IsChecked == true,
-            ClipboardHistoryMaxEntries = int.TryParse(ClipboardCapInput.Text.Trim(), out var cap) ? cap : 200,
             StartWithSystem = AutoStartCheck.IsChecked == true,
             PreferredScreenDeviceName = (ScreenCombo.SelectedItem as ComboBoxItem)?.Tag as string,
         };
@@ -78,12 +70,6 @@ public partial class SettingsWindow : Window
         if (!HotkeyPattern.TryParse(settings.HotkeyDisplay, out _, out _))
         {
             ShowError("全局热键格式不正确，示例：Ctrl+Alt+W 或 Ctrl+Shift+Space");
-            return false;
-        }
-
-        if (settings.ClipboardHistoryMaxEntries is < 10 or > 1000)
-        {
-            ShowError("剪贴板历史条数需在 10-1000 之间");
             return false;
         }
 

@@ -8,7 +8,7 @@
     <UseWPF>true</UseWPF>
     <RootNamespace>WatchMe</RootNamespace>
     <AssemblyName>WatchMe</AssemblyName>
-    <Version>1.0.0</Version>
+    <Version>2.0.0</Version>
     <Product>WatchMe</Product>
     <Authors>threetwoa</Authors>
     <Copyright>Copyright © 2026 threetwoa</Copyright>
@@ -17,9 +17,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="AvalonEdit" Version="6.3.1.120" />
     <PackageReference Include="Hardcodet.NotifyIcon.Wpf" Version="2.0.1" />
-    <PackageReference Include="MdXaml" Version="1.27.0" />
   </ItemGroup>
 
   <ItemGroup>

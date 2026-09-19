@@ -14,7 +14,6 @@ public class SettingsStoreTests : IDisposable
         var settings = new SettingsStore(_path).Load();
         Assert.Equal(TriggerMode.Hover, settings.Trigger);
         Assert.Equal(ThemeMode.Dark, settings.Theme);
-        Assert.True(settings.ClipboardHistoryEnabled);
         Assert.Equal("Ctrl+Alt+W", settings.HotkeyDisplay);
     }
 
@@ -29,7 +28,6 @@ public class SettingsStoreTests : IDisposable
             HotkeyDisplay = "Ctrl+Shift+Space",
             PreferredScreenDeviceName = @"\\.\DISPLAY2",
             StartWithSystem = true,
-            ClipboardHistoryMaxEntries = 500,
         };
         store.Save(settings);
 
@@ -39,20 +37,26 @@ public class SettingsStoreTests : IDisposable
         Assert.Equal("Ctrl+Shift+Space", loaded.HotkeyDisplay);
         Assert.Equal(@"\\.\DISPLAY2", loaded.PreferredScreenDeviceName);
         Assert.True(loaded.StartWithSystem);
-        Assert.Equal(500, loaded.ClipboardHistoryMaxEntries);
     }
 
     [Fact]
-    public void Load_GuardsCorruptedCap()
+    public void Load_ToleratesLegacyJson_WithRemovedFields()
     {
-        var store = new SettingsStore(_path);
-        store.Save(new AppSettings { ClipboardHistoryMaxEntries = 99 });
-        var loaded = store.Load();
-        Assert.Equal(99, loaded.ClipboardHistoryMaxEntries);
+        const string legacyJson = """
+            {
+              "trigger": 1,
+              "theme": 2,
+              "hotkeyDisplay": "Ctrl+Alt+J",
+              "clipboardHistoryEnabled": true,
+              "clipboardHistoryMaxEntries": 300
+            }
+            """;
+        File.WriteAllText(_path, legacyJson);
 
-        var hostile = new AppSettings { ClipboardHistoryMaxEntries = 999999 };
-        store.Save(hostile);
-        Assert.Equal(200, new SettingsStore(_path).Load().ClipboardHistoryMaxEntries);
+        var loaded = new SettingsStore(_path).Load();
+        Assert.Equal(TriggerMode.Click, loaded.Trigger);
+        Assert.Equal(ThemeMode.Dark, loaded.Theme);
+        Assert.Equal("Ctrl+Alt+J", loaded.HotkeyDisplay);
     }
 
     [Theory]

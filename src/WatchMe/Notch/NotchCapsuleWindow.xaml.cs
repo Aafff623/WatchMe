@@ -7,7 +7,7 @@ namespace WatchMe.Notch;
 
 /// <summary>
 /// The always-visible "notch" pill at the top-center of the screen: the hot zone that
-/// opens the drop-down panel on hover or click (per trigger mode), and accepts file drops.
+/// opens the sticky-note panel on hover or click (per trigger mode).
 /// It never activates so hovering it can never steal keyboard focus.
 /// </summary>
 public partial class NotchCapsuleWindow : Window
@@ -27,11 +27,6 @@ public partial class NotchCapsuleWindow : Window
     internal TriggerMode TriggerMode { private get; set; } = TriggerMode.Hover;
 
     public event Action? ExpansionRequested;
-
-    public event Action<IReadOnlyList<string>>? FilesDropped;
-
-    public void SetCoffeeActive(bool active) => Dispatcher.Invoke(() =>
-        CoffeeDot.Visibility = active ? Visibility.Visible : Visibility.Collapsed);
 
     protected override void OnMouseEnter(MouseEventArgs e)
     {
@@ -53,13 +48,5 @@ public partial class NotchCapsuleWindow : Window
     {
         base.OnMouseLeftButtonUp(e);
         ExpansionRequested?.Invoke();
-    }
-
-    private void OnDragOver(object sender, DragEventArgs e) => e.Effects = DragDropEffects.Copy;
-
-    private void OnDrop(object sender, DragEventArgs e)
-    {
-        if (e.Data.GetData(DataFormats.FileDrop) is string[] paths && paths.Length > 0)
-            FilesDropped?.Invoke(paths);
     }
 }
