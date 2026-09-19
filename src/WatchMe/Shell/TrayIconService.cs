@@ -80,6 +80,9 @@ public sealed class TrayIconService : IDisposable
         });
     }
 
+    public void ShowBalloonTip(string title, string message) => Application.Current.Dispatcher.Invoke(() =>
+        _icon.ShowBalloonTip(title, message, Hardcodet.Wpf.TaskbarNotification.BalloonIcon.Warning));
+
     public void SetLidNeverSleepActive(bool active)
     {
         _lidActive = active;

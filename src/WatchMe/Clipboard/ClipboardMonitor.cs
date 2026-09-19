@@ -49,20 +49,35 @@ public sealed class ClipboardMonitor : IDisposable
             if (System.Windows.Clipboard.ContainsText())
             {
                 var text = System.Windows.Clipboard.GetText();
-                _ = _store.AddText(text);
+                if (_store.AddText(text) is not null)
+                    Persist();
             }
             else if (System.Windows.Clipboard.ContainsImage())
             {
                 var source = System.Windows.Clipboard.GetImage();
                 if (source is not null && ToPngBytes(source) is { Length: > 0 } png)
                 {
-                    _ = _store.AddImage(png);
+                    if (_store.AddImage(png) is not null)
+                        Persist();
                 }
             }
         }
         catch (COMException)
         {
             // The clipboard can be locked by another process; we simply skip that update.
+        }
+    }
+
+    /// <summary>Persists right away so a crash or forced kill never loses history.</summary>
+    private void Persist()
+    {
+        try
+        {
+            _store.SaveNow();
+        }
+        catch (IOException)
+        {
+            // Best effort — the next capture retries.
         }
     }
 

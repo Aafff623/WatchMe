@@ -56,12 +56,38 @@ public sealed class NotchController : IDisposable
         if (settings.ClipboardHistoryEnabled)
             StartClipboardHistory();
 
-        _keepAwake.RecoverOnStartup();
         SyncKeepAwakeUi();
 
         _tray.Show();
-        _ = _hotkey.Apply(settings.HotkeyDisplay);
+        _hotkeyRegistrationOk = _hotkey.Apply(settings.HotkeyDisplay);
+        if (!_hotkeyRegistrationOk)
+            WarnHotkeyUnavailable(settings.HotkeyDisplay);
         _capsule.Show();
+
+        // Crash recovery may raise a UAC prompt; run it off the UI thread so startup never blocks.
+        if (_keepAwake.LidNeverSleepActive)
+        {
+            _ = Task.Run(() =>
+            {
+                _keepAwake.RecoverOnStartup();
+                _tray.SetLidNeverSleepActive(_keepAwake.LidNeverSleepActive);
+            });
+        }
+    }
+
+    private bool _hotkeyRegistrationOk = true;
+
+    private void WarnHotkeyUnavailable(string hotkeyDisplay)
+    {
+        // Another app owns the combination; without a hint the user never learns why the hotkey is dead.
+        var timer = new System.Windows.Threading.DispatcherTimer { Interval = TimeSpan.FromSeconds(2) };
+        timer.Tick += (_, _) =>
+        {
+            timer.Stop();
+            _tray.ShowBalloonTip("全局热键不可用",
+                $"{hotkeyDisplay} 已被其他程序占用，呼出面板请悬停顶部胶囊，或在设置中更换热键。");
+        };
+        timer.Start();
     }
 
     private void OnCapsuleExpansion() => ExpandPanel(activate: false);
@@ -145,7 +171,6 @@ public sealed class NotchController : IDisposable
         var window = new ClipboardHistoryWindow(
             _clipboardStore,
             _clipboardMonitor!,
-            _panel.GetCurrentNoteText,
             _panel.AppendToCurrentNote)
         {
             Owner = null,
@@ -175,26 +200,32 @@ public sealed class NotchController : IDisposable
         _capsule.TriggerMode = settings.Trigger;
         ThemeManager.Apply(settings.Theme);
         Reposition();
-        _ = _hotkey.Apply(settings.HotkeyDisplay);
+        _hotkeyRegistrationOk = _hotkey.Apply(settings.HotkeyDisplay);
+        if (!_hotkeyRegistrationOk)
+            _tray.ShowBalloonTip("全局热键不可用", $"{settings.HotkeyDisplay} 已被其他程序占用，请换一个组合。");
 
         if (settings.ClipboardHistoryEnabled)
         {
+            // A changed cap needs a rebuilt store; an existing monitor is kept as-is.
+            if (_clipboardStore is not null
+                && _clipboardStore.Entries.Count > 0
+                && _settings.ClipboardHistoryMaxEntries != settings.ClipboardHistoryMaxEntries)
+            {
+                StopClipboardHistory();
+            }
+
             if (_clipboardStore is null || _clipboardMonitor is null)
-            {
                 StartClipboardHistory();
-            }
-            else if (_clipboardStore.Entries.Count > settings.ClipboardHistoryMaxEntries)
-            {
-                _clipboardStore.SaveNow();
-                StartClipboardHistory();
-            }
         }
         else
         {
             StopClipboardHistory();
         }
 
-        AutoStartManager.SetEnabled(settings.StartWithSystem);
+        // Never touch the registry on the startup path — only when the user changes the toggle,
+        // so a manually configured autostart is not silently deleted.
+        if (save)
+            AutoStartManager.SetEnabled(settings.StartWithSystem);
         if (save)
             SettingsStore.Default().Save(settings);
     }

@@ -54,16 +54,14 @@ public partial class ClipboardHistoryWindow : Window
 {
     private readonly ClipboardHistoryStore _store;
     private readonly ClipboardMonitor _monitor;
-    private readonly Func<string> _noteTextProvider;
     private readonly Action<string> _noteTextAppender;
 
     public ClipboardHistoryWindow(ClipboardHistoryStore store, ClipboardMonitor monitor,
-        Func<string> noteTextProvider, Action<string> noteTextAppender)
+        Action<string> noteTextAppender)
     {
         InitializeComponent();
         _store = store;
         _monitor = monitor;
-        _noteTextProvider = noteTextProvider;
         _noteTextAppender = noteTextAppender;
     }
 
@@ -103,14 +101,14 @@ public partial class ClipboardHistoryWindow : Window
         if (RowFrom(sender) is not { } row)
             return;
 
-        var text = row.Entry.Kind == ClipboardEntryKind.Text
+        string? text = row.Entry.Kind == ClipboardEntryKind.Text
             ? row.Entry.Text
             : row.Entry.ImageFile is not null ? $"![clipboard]({row.Entry.ImageFile.Replace('\\', '/')})" : null;
         if (text is null)
             return;
 
-        var current = _noteTextProvider();
-        _noteTextAppender((current.Length > 0 && !current.EndsWith('\n') ? current + "\n" : current) + text + "\n");
+        // AppendText inserts at the document end; pass only the new content.
+        _noteTextAppender(text + "\n");
         Close();
     }
 

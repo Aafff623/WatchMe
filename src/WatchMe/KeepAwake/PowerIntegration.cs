@@ -35,8 +35,9 @@ public sealed class PowerProcessRunner : IPowerProcessRunner
                 {
                     process.Kill();
                 }
-                catch (InvalidOperationException)
+                catch (Exception killEx) when (killEx is InvalidOperationException or System.ComponentModel.Win32Exception)
                 {
+                    // Killing an elevated child from a normal process can be denied; treat as failure.
                 }
 
                 return null;

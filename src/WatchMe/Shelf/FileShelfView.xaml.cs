@@ -52,7 +52,7 @@ public partial class FileShelfView : UserControl
     private readonly FileShelfStore _store;
     private readonly ObservableCollection<ShelfChip> _chips = [];
     private readonly ShelfSelection<ShelfChip> _selection = new();
-    private readonly Dictionary<string, BitmapSource?> _thumbnailCache = new(StringComparer.OrdinalIgnoreCase);
+    private readonly System.Collections.Concurrent.ConcurrentDictionary<string, BitmapSource?> _thumbnailCache = new(StringComparer.OrdinalIgnoreCase);
     private Point _dragStart;
     private bool _dragPending;
 

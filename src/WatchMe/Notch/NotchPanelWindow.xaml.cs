@@ -90,7 +90,20 @@ public partial class NotchPanelWindow : Window
 
     private void FocusPanel()
     {
-        Activate();
+        if (Activate())
+        {
+            Focus();
+            Notebook.FocusEditor();
+            return;
+        }
+
+        // Foreground lock refused activation; the classic ALT-key nudge releases it.
+        const byte VK_MENU = 0x12;
+        const uint KEYEVENTF_KEYUP = 0x0002;
+        WatchMe.Interop.NativeMethods.keybd_event(VK_MENU, 0, 0, IntPtr.Zero);
+        WatchMe.Interop.NativeMethods.keybd_event(VK_MENU, 0, KEYEVENTF_KEYUP, IntPtr.Zero);
+        _ = WatchMe.Interop.NativeMethods.SetForegroundWindow(
+            new System.Windows.Interop.WindowInteropHelper(this).Handle);
         Focus();
         Notebook.FocusEditor();
     }

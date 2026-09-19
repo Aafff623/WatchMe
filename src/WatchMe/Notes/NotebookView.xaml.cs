@@ -83,9 +83,7 @@ public partial class NotebookView : UserControl
         }
 
         Editor.Document.Insert(at, text);
-        if (!text.EndsWith('\n'))
-            Editor.Document.Insert(at + text.Length, "\n");
-        Select(at + text.Length + 1, 0);
+        Select(at + text.Length, 0);
         FocusEditor();
     }
 
@@ -173,6 +171,9 @@ public partial class NotebookView : UserControl
 
     private void Select(int offset, int length)
     {
+        // Out-of-range offsets make AvalonEdit throw; clamp to the document bounds.
+        offset = Math.Clamp(offset, 0, Editor.Document.TextLength);
+        length = Math.Clamp(length, 0, Editor.Document.TextLength - offset);
         Editor.Select(offset, length);
         Editor.TextArea.Caret.Offset = offset + length;
         Editor.TextArea.Caret.BringCaretToView();
@@ -319,23 +320,31 @@ public partial class NotebookView : UserControl
 
     private bool TryPasteImage()
     {
-        if (System.Windows.Clipboard.ContainsText() || !System.Windows.Clipboard.ContainsImage())
-            return false;
+        try
+        {
+            if (System.Windows.Clipboard.ContainsText() || !System.Windows.Clipboard.ContainsImage())
+                return false;
 
-        var source = System.Windows.Clipboard.GetImage();
-        if (source is null)
-            return false;
+            var source = System.Windows.Clipboard.GetImage();
+            if (source is null)
+                return false;
 
-        var encoder = new PngBitmapEncoder();
-        encoder.Frames.Add(BitmapFrame.Create(source));
-        using var stream = new MemoryStream();
-        encoder.Save(stream);
-        var path = _imageStore.SavePng(stream.ToArray());
-        var link = NoteImageStore.ToMarkdownLink(path, Path.GetFileName(path));
-        var insertAt = Editor.SelectionStart + Editor.SelectionLength;
-        var trailing = Editor.Text.Length > 0 && Editor.Text[^1] != '\n' ? "\n" : string.Empty;
-        Editor.Document.Insert(insertAt, trailing + link + "\n");
-        Select(insertAt + trailing.Length + link.Length + 1, 0);
-        return true;
+            var encoder = new PngBitmapEncoder();
+            encoder.Frames.Add(BitmapFrame.Create(source));
+            using var stream = new MemoryStream();
+            encoder.Save(stream);
+            var path = _imageStore.SavePng(stream.ToArray());
+            var link = NoteImageStore.ToMarkdownLink(path, Path.GetFileName(path));
+            var insertAt = Editor.SelectionStart + Editor.SelectionLength;
+            var trailing = Editor.Text.Length > 0 && Editor.Text[^1] != '\n' ? "\n" : string.Empty;
+            Editor.Document.Insert(insertAt, trailing + link + "\n");
+            Select(insertAt + trailing.Length + link.Length + 1, 0);
+            return true;
+        }
+        catch (System.Runtime.InteropServices.COMException)
+        {
+            // Clipboard locked by another process — treat as "nothing to paste".
+            return false;
+        }
     }
 }

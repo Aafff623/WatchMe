@@ -48,7 +48,11 @@ public partial class SettingsWindow : Window
         if (!TryBuildSettings(out var settings))
             return;
 
-        if (!ProbeHotkey(settings.HotkeyDisplay))
+        // Only probe when the hotkey actually changed: our own live registration
+        // would make RegisterHotKey fail for the same combination.
+        var changed = !string.Equals(settings.HotkeyDisplay.Trim(), _current.HotkeyDisplay.Trim(),
+            StringComparison.OrdinalIgnoreCase);
+        if (changed && !ProbeHotkey(settings.HotkeyDisplay))
         {
             ShowError("该热键组合当前被其他程序占用，请换一个");
             return;
