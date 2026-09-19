@@ -1,0 +1,95 @@
+<Window x:Class="WatchMe.Settings.SettingsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="WatchMe 设置" Width="440" Height="600" WindowStartupLocation="CenterScreen"
+        ResizeMode="NoResize" ShowInTaskbar="False" Topmost="True"
+        Background="{DynamicResource Brush.PanelBgSolid}"
+        PreviewKeyDown="OnPreviewKeyDown">
+    <Window.Resources>
+        <Style x:Key="SectionTitle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="Foreground" Value="{DynamicResource Brush.TextPrimary}" />
+            <Setter Property="Margin" Value="0,14,0,6" />
+        </Style>
+        <Style x:Key="BodyText" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="11.5" />
+            <Setter Property="Foreground" Value="{DynamicResource Brush.TextSecondary}" />
+        </Style>
+        <Style x:Key="Check" TargetType="CheckBox">
+            <Setter Property="Foreground" Value="{DynamicResource Brush.TextPrimary}" />
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="Margin" Value="0,4" />
+        </Style>
+        <Style x:Key="Radio" TargetType="RadioButton">
+            <Setter Property="Foreground" Value="{DynamicResource Brush.TextPrimary}" />
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="Margin" Value="0,4,16,4" />
+        </Style>
+        <Style x:Key="Combo" TargetType="ComboBox">
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="Margin" Value="0,2" />
+            <Setter Property="MinWidth" Value="200" />
+        </Style>
+        <Style x:Key="InputBox" TargetType="TextBox">
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="Padding" Value="5,3" />
+            <Setter Property="Margin" Value="0,2" />
+            <Setter Property="MinWidth" Value="200" />
+            <Setter Property="Background" Value="{DynamicResource Brush.EditorBg}" />
+            <Setter Property="Foreground" Value="{DynamicResource Brush.TextPrimary}" />
+            <Setter Property="CaretBrush" Value="{DynamicResource Brush.TextPrimary}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource Brush.PanelBorder}" />
+        </Style>
+    </Window.Resources>
+
+    <DockPanel Margin="16">
+        <Border DockPanel.Dock="Bottom" Margin="0,12,0,0">
+            <StackPanel>
+                <TextBlock x:Name="ErrorText" Foreground="{DynamicResource Brush.Danger}" FontSize="11"
+                           Visibility="Collapsed" Margin="0,0,0,8" TextWrapping="Wrap" />
+                <Button x:Name="SaveButton" Content="保存并关闭" Padding="16,7" FontSize="12.5" Click="OnSave"
+                        HorizontalAlignment="Right" Cursor="Hand" />
+            </StackPanel>
+        </Border>
+
+        <ScrollViewer VerticalScrollBarVisibility="Auto">
+            <StackPanel>
+                <TextBlock Style="{StaticResource SectionTitle}" Text="呼出方式" />
+                <StackPanel Orientation="Horizontal">
+                    <RadioButton x:Name="TriggerHover" Style="{StaticResource Radio}" GroupName="Trigger"
+                                 Content="悬停顶部胶囊" />
+                    <RadioButton x:Name="TriggerClick" Style="{StaticResource Radio}" GroupName="Trigger"
+                                 Content="点击顶部胶囊" />
+                </StackPanel>
+                <TextBlock Style="{StaticResource BodyText}" Text="全局热键随时可切换：Ctrl+Alt+W（可在下方修改）" />
+
+                <TextBlock Style="{StaticResource SectionTitle}" Text="外观" />
+                <ComboBox x:Name="ThemeCombo" Style="{StaticResource Combo}" SelectedIndex="0">
+                    <ComboBoxItem Content="跟随系统" />
+                    <ComboBoxItem Content="深色" />
+                    <ComboBoxItem Content="浅色" />
+                </ComboBox>
+
+                <TextBlock Style="{StaticResource SectionTitle}" Text="全局热键" />
+                <TextBox x:Name="HotkeyInput" Style="{StaticResource InputBox}"
+                         ToolTip="格式：Ctrl+Alt+Shift+Win + 字母/数字/F1-F12/Space" />
+                <TextBlock Style="{StaticResource BodyText}"
+                           Text="格式如 Ctrl+Alt+W 或 Ctrl+Shift+Space；保存时立即生效" />
+
+                <TextBlock Style="{StaticResource SectionTitle}" Text="显示器" />
+                <ComboBox x:Name="ScreenCombo" Style="{StaticResource Combo}" />
+
+                <TextBlock Style="{StaticResource SectionTitle}" Text="剪贴板历史" />
+                <CheckBox x:Name="ClipboardEnabled" Style="{StaticResource Check}" Content="启用剪贴板历史（文本与图片）" />
+                <TextBlock Style="{StaticResource BodyText}" Text="最多保留条数（10-1000）：" />
+                <TextBox x:Name="ClipboardCapInput" Style="{StaticResource InputBox}" />
+
+                <TextBlock Style="{StaticResource SectionTitle}" Text="系统" />
+                <CheckBox x:Name="AutoStartCheck" Style="{StaticResource Check}" Content="开机自动启动 WatchMe" />
+                <CheckBox x:Name="LidNeverSleepCheck" Style="{StaticResource Check}"
+                          Content="合盖不休眠（需要管理员授权，退出时自动恢复）" />
+            </StackPanel>
+        </ScrollViewer>
+    </DockPanel>
+</Window>

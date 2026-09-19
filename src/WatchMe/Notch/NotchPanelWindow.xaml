@@ -1,0 +1,94 @@
+<Window x:Class="WatchMe.Notch.NotchPanelWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:notes="clr-namespace:WatchMe.Notes"
+        xmlns:shelf="clr-namespace:WatchMe.Shelf"
+        WindowStyle="None" ResizeMode="NoResize" ShowInTaskbar="False" ShowActivated="False"
+        AllowsTransparency="True" Background="Transparent" Topmost="True"
+        Width="680" Height="640" Focusable="True"
+        PreviewKeyDown="OnPanelPreviewKeyDown"
+        Deactivated="OnPanelDeactivated"
+        MouseLeave="OnPanelMouseLeave" MouseEnter="OnPanelMouseEnter"
+        AllowDrop="True" DragOver="OnDragOver" Drop="OnDrop">
+    <Window.Resources>
+        <Style x:Key="TabPill" TargetType="Button">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="Foreground" Value="{DynamicResource Brush.TextSecondary}" />
+            <Setter Property="FontSize" Value="11" />
+            <Setter Property="Padding" Value="10,4" />
+            <Setter Property="Margin" Value="0,0,6,0" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="Bd" Background="{TemplateBinding Background}" CornerRadius="8"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter VerticalAlignment="Center" RecognizesAccessKey="False" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Bd" Property="Background" Value="{DynamicResource Brush.HoverBg}" />
+                                <Setter Property="Foreground" Value="{DynamicResource Brush.TextPrimary}" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="Tag" Value="Active">
+                    <Setter Property="Background" Value="{DynamicResource Brush.AccentSoft}" />
+                    <Setter Property="Foreground" Value="{DynamicResource Brush.TextPrimary}" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+        <Style x:Key="ActionButton" TargetType="Button" BasedOn="{StaticResource TabPill}">
+            <Setter Property="FontSize" Value="13" />
+        </Style>
+    </Window.Resources>
+
+    <Grid>
+        <Border x:Name="Root" VerticalAlignment="Top" Height="0" ClipToBounds="True"
+                Background="{DynamicResource Brush.PanelBg}"
+                BorderBrush="{DynamicResource Brush.PanelBorder}" BorderThickness="1,0,1,1"
+                CornerRadius="0,0,18,18" Opacity="0">
+            <DockPanel>
+                <!-- header: note tabs + actions -->
+                <Border DockPanel.Dock="Top" Padding="10,8,10,4" BorderBrush="{DynamicResource Brush.PanelBorder}"
+                        BorderThickness="0,0,0,1">
+                    <DockPanel>
+                        <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" HorizontalAlignment="Right">
+                            <Button x:Name="CoffeeButton" Style="{StaticResource ActionButton}" Content="☕"
+                                    Click="OnCoffeeClick" ToolTip="咖啡模式：阻止系统休眠（点击开关）" />
+                            <Button x:Name="ClipboardButton" Style="{StaticResource ActionButton}" Content="📋"
+                                    Click="OnClipboardClick" ToolTip="剪贴板历史" />
+                            <Button Style="{StaticResource ActionButton}" Content="⚙" Click="OnSettingsClick"
+                                    ToolTip="设置" />
+                            <Button Style="{StaticResource ActionButton}" Content="▴" Click="OnCollapseClick"
+                                    ToolTip="收起 (Esc)" />
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" x:Name="TabStripHost" />
+                    </DockPanel>
+                </Border>
+
+                <!-- editor -->
+                <notes:NotebookView x:Name="Notebook" />
+
+                <!-- shelf pinned to the bottom -->
+                <Border DockPanel.Dock="Bottom" BorderBrush="{DynamicResource Brush.PanelBorder}"
+                        BorderThickness="0,1,0,0">
+                    <shelf:FileShelfView x:Name="Shelf" />
+                </Border>
+            </DockPanel>
+        </Border>
+
+        <!-- file drop overlay -->
+        <Border x:Name="DropOverlay" Background="#660A84FF" CornerRadius="0,0,18,18" Visibility="Collapsed"
+                IsHitTestVisible="False">
+            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                <TextBlock Text="📥" FontSize="40" HorizontalAlignment="Center" />
+                <TextBlock Text="松手放入暂存架" FontSize="16" Foreground="White" HorizontalAlignment="Center"
+                           Margin="0,8,0,0" />
+            </StackPanel>
+        </Border>
+    </Grid>
+</Window>

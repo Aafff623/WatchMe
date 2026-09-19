@@ -1,9 +1,26 @@
-.build/
+# .NET build artifacts
+bin/
+obj/
+artifacts/
+publish/
+*.user
+*.suo
+
+# Local workspace (research, scripts, secrets, previews) — never commit
+temp/
+
+# CodeGraph local index
+.codegraph/
+
+# Test results
+TestResults/
+*.trx
+
+# OS noise
 .DS_Store
-DerivedData/
-NotchNotes.app/
-dist/
-dist.noindex/
-.runtime/
-.swiftpm/
-*.xcuserdatad
+Thumbs.db
+
+# Editor
+.vs/
+.idea/
+*.swp
