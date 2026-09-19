@@ -1,0 +1,134 @@
+<svg width="1200" height="560" viewBox="0 0 1200 560" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="WatchMe: a capsule at the top of your screen drops down into notes and a file shelf">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0d0d14"/>
+      <stop offset="0.55" stop-color="#14141d"/>
+      <stop offset="1" stop-color="#0a1420"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#0A84FF"/>
+      <stop offset="1" stop-color="#5E5CE6"/>
+    </linearGradient>
+    <linearGradient id="panel" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#1e1e28"/>
+      <stop offset="1" stop-color="#17171f"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="0.5" cy="0" r="1">
+      <stop offset="0" stop-color="#0A84FF" stop-opacity="0.22"/>
+      <stop offset="1" stop-color="#0A84FF" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <rect width="1200" height="560" rx="18" fill="url(#bg)"/>
+  <rect width="1200" height="300" fill="url(#glow)"/>
+
+  <!-- top screen edge -->
+  <line x1="40" y1="26" x2="1160" y2="26" stroke="#2a2a36" stroke-width="2"/>
+  <text x="46" y="20" fill="#4a4a58" font-family="Segoe UI, sans-serif" font-size="11">desktop top edge</text>
+
+  <!-- capsule -->
+  <rect x="530" y="24" width="140" height="17" rx="0" fill="#1C1C22" stroke="#3A3A46" stroke-width="1"/>
+  <rect x="531" y="40" width="138" height="1" rx="0.5" fill="#3A3A46"/>
+  <text x="600" y="36" text-anchor="middle" fill="#9E9EA8" font-family="Segoe UI, sans-serif" font-size="9.5">WatchMe</text>
+
+  <!-- drop arrow -->
+  <path d="M600 46 L600 64 M594 58 L600 65 L606 58" stroke="#0A84FF" stroke-width="2" fill="none" stroke-linecap="round"/>
+
+  <!-- panel -->
+  <rect x="380" y="72" width="440" height="330" rx="14" fill="url(#panel)" stroke="#3A3A46" stroke-width="1.5"/>
+
+  <!-- tabs -->
+  <rect x="398" y="90" width="86" height="24" rx="8" fill="#2C2C3A"/>
+  <text x="441" y="106" text-anchor="middle" fill="#F2F2F7" font-family="Segoe UI, sans-serif" font-size="11">New Note</text>
+  <rect x="490" y="90" width="24" height="24" rx="8" fill="#232329"/>
+  <text x="502" y="106" text-anchor="middle" fill="#9E9EA8" font-family="Segoe UI, sans-serif" font-size="12">+</text>
+
+  <!-- actions -->
+  <circle cx="754" cy="102" r="9" fill="#232329"/>
+  <text x="754" y="106" text-anchor="middle" font-size="10">☕</text>
+  <circle cx="778" cy="102" r="9" fill="#232329"/>
+  <text x="778" y="106" text-anchor="middle" font-size="10">📋</text>
+  <circle cx="802" cy="102" r="9" fill="#232329"/>
+  <text x="802" y="106" text-anchor="middle" font-size="10">⚙</text>
+
+  <!-- toolbar -->
+  <g font-family="Segoe UI, sans-serif" font-size="10.5" fill="#9E9EA8">
+    <text x="404" y="136" font-weight="bold" fill="#F2F2F7">B</text>
+    <text x="422" y="136" font-style="italic">I</text>
+    <text x="438" y="136" text-decoration="line-through">S</text>
+    <text x="456" y="136" font-family="Cascadia Mono, monospace">&lt;/&gt;</text>
+    <text x="486" y="136">🔗</text>
+    <text x="510" y="136">❝</text>
+    <text x="532" y="136">•—</text>
+    <text x="560" y="136">☑</text>
+    <text x="592" y="136" fill="#0A84FF">编辑</text>
+    <text x="622" y="136">分栏</text>
+    <text x="652" y="136">预览</text>
+    <text x="684" y="136">🔍</text>
+  </g>
+  <line x1="396" y1="148" x2="804" y2="148" stroke="#2a2a36" stroke-width="1"/>
+
+  <!-- editor | preview -->
+  <rect x="398" y="160" width="192" height="176" rx="8" fill="#232329" stroke="#3A3A46"/>
+  <rect x="410" y="176" width="120" height="7" rx="3.5" fill="#4a4a58"/>
+  <rect x="410" y="192" width="150" height="6" rx="3" fill="#33333f"/>
+  <rect x="410" y="206" width="96" height="6" rx="3" fill="#33333f"/>
+  <rect x="410" y="228" width="14" height="14" rx="3" fill="none" stroke="#0A84FF" stroke-width="1.5"/>
+  <rect x="430" y="233" width="110" height="6" rx="3" fill="#33333f"/>
+  <rect x="410" y="256" width="150" height="6" rx="3" fill="#33333f"/>
+  <rect x="410" y="270" width="132" height="6" rx="3" fill="#33333f"/>
+  <text x="494" y="322" text-anchor="middle" fill="#5a5a66" font-family="Segoe UI, sans-serif" font-size="10">Markdown 编辑</text>
+
+  <rect x="610" y="160" width="192" height="176" rx="8" fill="#1b1b24" stroke="#3A3A46"/>
+  <rect x="624" y="178" width="96" height="12" rx="3" fill="#0A84FF" opacity="0.85"/>
+  <rect x="624" y="202" width="160" height="6" rx="3" fill="#3d3d4a"/>
+  <rect x="624" y="216" width="130" height="6" rx="3" fill="#3d3d4a"/>
+  <rect x="624" y="240" width="60" height="40" rx="4" fill="#2C2C3A"/>
+  <rect x="694" y="240" width="60" height="40" rx="4" fill="#2C2C3A"/>
+  <rect x="624" y="292" width="150" height="6" rx="3" fill="#3d3d4a"/>
+  <text x="706" y="322" text-anchor="middle" fill="#5a5a66" font-family="Segoe UI, sans-serif" font-size="10">实时预览</text>
+
+  <!-- shelf -->
+  <line x1="396" y1="348" x2="804" y2="348" stroke="#2a2a36" stroke-width="1"/>
+  <text x="404" y="370" fill="#F2F2F7" font-family="Segoe UI, sans-serif" font-size="10.5">📎 暂存架</text>
+  <text x="796" y="370" text-anchor="end" fill="#5a5a66" font-family="Segoe UI, sans-serif" font-size="9">拖入文件 · 拖出取用 · 空格预览</text>
+  <g>
+    <rect x="398" y="378" width="64" height="14" rx="7" fill="#2A2A34" stroke="#40404C"/>
+    <rect x="468" y="378" width="52" height="14" rx="7" fill="#2A2A34" stroke="#40404C"/>
+    <rect x="526" y="378" width="72" height="14" rx="7" fill="#2A2A34" stroke="#0A84FF" stroke-width="1.5"/>
+    <rect x="604" y="378" width="44" height="14" rx="7" fill="#2A2A34" stroke="#FF453A"/>
+  </g>
+
+  <!-- side annotations -->
+  <g font-family="Segoe UI, sans-serif" fill="#8a8a96" font-size="12">
+    <text x="150" y="120">全局热键</text>
+    <text x="150" y="140" fill="#F2F2F7" font-size="16" font-weight="600">Ctrl + Alt + W</text>
+    <text x="150" y="170" font-size="11">悬停或点击顶部胶囊，</text>
+    <text x="150" y="188" font-size="11">面板从屏幕顶端滑出。</text>
+
+    <text x="150" y="280">咖啡模式</text>
+    <text x="150" y="300" font-size="11">一键阻止系统休眠，</text>
+    <text x="150" y="318" font-size="11">可选「合盖不休眠」。</text>
+  </g>
+  <g font-family="Segoe UI, sans-serif" fill="#8a8a96" font-size="12">
+    <text x="920" y="120">文件暂存架</text>
+    <text x="920" y="140" font-size="11">把文件拖到屏幕顶部，</text>
+    <text x="920" y="158" font-size="11">随手暂存、随手拖出。</text>
+
+    <text x="920" y="280">剪贴板历史</text>
+    <text x="920" y="300" font-size="11">文本与图片自动留档，</text>
+    <text x="920" y="318" font-size="11">可搜索、可回贴。</text>
+  </g>
+  <g stroke="#2f2f3c" stroke-width="1" stroke-dasharray="3 4">
+    <line x1="290" y1="130" x2="375" y2="130"/>
+    <line x1="290" y1="300" x2="375" y2="300"/>
+    <line x1="905" y1="130" x2="825" y2="130"/>
+    <line x1="905" y1="300" x2="825" y2="300"/>
+  </g>
+
+  <!-- footer strip -->
+  <rect x="380" y="430" width="440" height="54" rx="10" fill="#111119" stroke="#26262f"/>
+  <text x="600" y="452" text-anchor="middle" fill="#F2F2F7" font-family="Segoe UI, sans-serif" font-size="13" font-weight="600">WatchMe</text>
+  <text x="600" y="470" text-anchor="middle" fill="#7a7a86" font-family="Segoe UI, sans-serif" font-size="10">顶部胶囊 · 笔记 · 暂存架 · 防休眠 · 剪贴板历史 — 为 Windows 而生</text>
+  <rect x="380" y="486" width="440" height="4" rx="2" fill="url(#accent)"/>
+</svg>
